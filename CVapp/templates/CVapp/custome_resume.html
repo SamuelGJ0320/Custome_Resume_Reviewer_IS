@@ -17,9 +17,7 @@
             padding: 20px;
             margin: 20px 0;
             background-color: #e9f7e9;
-
             position: relative; /* Para posicionar el botón en la esquina superior */
-
         }
         .title-container {
             display: flex;
@@ -36,7 +34,6 @@
             width: 250px; /* Ajusta el tamaño según tus necesidades */
             height: auto;
         }
-
         .copy-button {
             position: absolute; /* Posiciona el botón en la esquina superior */
             top: 10px; /* Ajusta la distancia desde la parte superior */
@@ -50,7 +47,6 @@
             width: 25px; /* Ajusta el tamaño de la imagen */
             height: auto; /* Mantiene la relación de aspecto */
         }
-
     </style>
 </head>
 <body>
@@ -62,35 +58,31 @@
     </div>
     <p>¡Mejora tu hoja de vida para aumentar tus posibilidades de alcanzar tu empleo deseado!</p>
 
-    <!-- Upload file -->
-    <div class="row">
-        <div class="col-md-6 custom-box">
+    <!-- Formulario para subir archivos -->
+    <form method="POST" action="{% url 'custome_resume' %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 custom-box">
+                <label for="cvFile" class="form-label">Ingresa tu cv en forma de texto</label>
+                <textarea name="cv_text" class="form-control" id="cvFile" rows="10" placeholder="Text">{{ cvFile }}</textarea>
+            </div>
 
-            <label for="cvFile" class="form-label">Ingresa tu cv en forma de texto</label>
-            <textarea class="form-control" id="cvFile" rows="10" placeholder="Text"></textarea>
-
-
+            <div class="col-md-6 custom-box">
+                <label for="vacancy" class="form-label">Ingresa vacante y especificaciones</label>
+                <textarea name="vacancy_text" class="form-control" id="vacancy" rows="10" placeholder="Text">{{ vacancy }}</textarea>
+            </div>
         </div>
 
-        <div class="col-md-6 custom-box">
-            <label for="vacancy" class="form-label">Ingresa vacante y especificaciones</label>
-
-            <textarea class="form-control" id="vacancy" rows="10" placeholder="Text"></textarea>
-
+        <!-- CV input -->
+        <div class="custom-box">
+            <label for="newCv" class="form-label">Nuevo CV</label>
+            <textarea class="form-control" id="newCv" rows="10" placeholder="Text" readonly>{{ newCv }}</textarea>
+            <button type="submit" class="btn btn-success mt-3">Mejorar Cv</button> <!-- Botón para enviar los textos a la IA -->
+            <button class="copy-button" aria-label="Copiar texto" onclick="copyToClipboard()"> <!-- Botón para copiar el texto -->
+                <img src="{% static 'images/copy.jpg' %}" alt="Copiar" title="Copiar texto"> 
+            </button>
         </div>
-    </div>
-
-    <!-- CV input -->
-    <div class="custom-box">
-        <label for="newCv" class="form-label">Nuevo CV</label>
-
-        <textarea class="form-control" id="newCv" rows="10" placeholder="Text"></textarea>
-        <button class="copy-button" aria-label="Copiar texto" onclick="copyToClipboard()">
-            <img src="{% static 'images/copy.jpg' %}" alt="Copiar" title="Copiar texto"> 
-        </button>
-        
-    </div>
-    
+    </form>
 </div>
 
 <script>
@@ -98,17 +90,15 @@
         const textarea = document.getElementById("newCv");
         navigator.clipboard.writeText(textarea.value)
             .then(() => {
-                alert("Texto copiado en el portapapeles")
-    })
-    .catch(err=> {
-        console.error("Error al copiar texto", err);
-    });
+                alert("Texto copiado en el portapapeles");
+            })
+            .catch(err => {
+                console.error("Error al copiar texto", err);
+            });
     }
-
-    
 </script>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
