@@ -20,7 +20,17 @@ def mejorar_cv(request):
     prompt = (
         f"Aquí está la descripción de una vacante: {vacancy_text}\n\n"
         f"Este es el CV actual:\n{cv_text}\n\n"
-        f"Por favor, revisa el CV y sugiere formas de resaltar las habilidades y experiencias relevantes para la vacante sin modificar la información personal y sin decir mentiras, ademas solo dame el cv mejorado no ningun texto aparte ."
+        f"""
+            A continuación te proporcionaré el texto de un currículum vitae y una vacante. 
+
+            Quiero que edites el CV para que resaltes las habilidades y experiencias que son relevantes para la vacante, 
+            eliminando información irrelevante que no se ajuste al puesto. 
+
+            No debes inventar información ni eliminar datos personales como el nombre, correo electrónico o número de teléfono. 
+            Tampoco incluyas comentarios adicionales ni ningún mensaje como "Aquí está tu CV mejorado"; 
+            solo necesito el texto del currículum actualizado.
+            """
+
     )
 
 
