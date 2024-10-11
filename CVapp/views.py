@@ -2,6 +2,8 @@ from django.shortcuts import render
 from dotenv import load_dotenv
 import os
 import openai  
+from .models import *
+
 
 # Carga las API keys y otros valores de entorno
 _ = load_dotenv('api_keys_1.env')
@@ -47,6 +49,12 @@ def mejorar_cv(request):
 
     # Obtener el texto del CV mejorado
     new_cv = response['choices'][0]['message']['content'].strip()
+    improved_cv_record = ImprovedCV(  # Cambié a 'ImprovedCV' en lugar de 'new_cv'
+        original_cv=cv_text,               # CV original
+        vacancy_description=vacancy_text,   # Descripción de la vacante
+        improved_cv=new_cv                  # CV mejorado
+    )
+    improved_cv_record.save()
 
     # Renderizar la página de nuevo con el nuevo CV
     return render(request, 'custome_resume.html', {
