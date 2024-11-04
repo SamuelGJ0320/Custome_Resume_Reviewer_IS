@@ -1,12 +1,12 @@
+from django.http import JsonResponse
 from django.shortcuts import render
+import json
+import openai
 from dotenv import load_dotenv
 import os
-import openai  
-from .models import *
-
 
 # Carga las API keys y otros valores de entorno
-_ = load_dotenv('api_keys_1.env')
+load_dotenv('api_keys_1.env')
 openai.api_key = os.getenv('openai_apikey')
 
 def custom_resume_view(request):
@@ -32,33 +32,45 @@ def mejorar_cv(request):
             Tampoco incluyas comentarios adicionales ni ningún mensaje como "Aquí está tu CV mejorado"; 
             solo necesito el texto del currículum actualizado.
             """
-
     )
-
-
 
     # Llamar a la API de OpenAI para generar el nuevo CV
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=[
-            {"role": "user", "content": prompt},
-        ],
+        messages=[{"role": "user", "content": prompt}],
         max_tokens=1024,
         temperature=0.7,
     )
 
     # Obtener el texto del CV mejorado
     new_cv = response['choices'][0]['message']['content'].strip()
-    improved_cv_record = ImprovedCV(  # Cambié a 'ImprovedCV' en lugar de 'new_cv'
-        original_cv=cv_text,               # CV original
-        vacancy_description=vacancy_text,   # Descripción de la vacante
-        improved_cv=new_cv                  # CV mejorado
+    improved_cv_record = ImprovedCV(
+        original_cv=cv_text,
+        vacancy_description=vacancy_text,
+        improved_cv=new_cv
     )
     improved_cv_record.save()
 
-    # Renderizar la página de nuevo con el nuevo CV
     return render(request, 'custome_resume.html', {
         'cvText': cv_text,
         'vacancy': vacancy_text,
-        'newCv': new_cv,
+        'newCv': new_cv
     })
+
+def fetch_recommendations(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        job_title = data.get("job", "")
+
+        # Llama a OpenAI para obtener recomendaciones
+        prompt = f"Proporciona las últimas tendencias de contratación para el puesto de {job_title}."
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=300,
+            temperature=0.7,
+        )
+        recommendations = response['choices'][0]['message']['content'].strip().split('\n')
+
+        return JsonResponse({"recommendations": recommendations})
+    return JsonResponse({"error": "Invalid request"}, status=400)

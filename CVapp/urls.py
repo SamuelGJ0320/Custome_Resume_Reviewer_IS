@@ -1,7 +1,7 @@
-# CVapp/urls.py
 from django.urls import path
-from .views import custom_resume_view
+from . import views
 
 urlpatterns = [
-    path('', custom_resume_view, name='custom_resume_view'),
+    path('', views.custom_resume_view, name='custom_resume_view'),
+    path('fetch_recommendations/', views.fetch_recommendations, name='fetch_recommendations'),
 ]
