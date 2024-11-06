@@ -4,6 +4,7 @@ import json
 import openai
 from dotenv import load_dotenv
 import os
+from .models import ImprovedCV
 
 # Carga las API keys y otros valores de entorno
 load_dotenv('api_keys_1.env')
