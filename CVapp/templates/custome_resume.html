@@ -14,38 +14,38 @@
         .custom-box {
             border: 2px solid #28a745;
             border-radius: 8px;
-            padding: 10px; /* Reduce el padding para que suba más */
+            padding: 10px;
             margin: 20px 0;
             background-color: #e9f7e9;
         }
         .title-container {
             display: flex;
             align-items: center;
-            justify-content: center; /* Opcional: centra horizontalmente */
+            justify-content: center;
         }
         .title {
             font-weight: bold;
             font-size: 24px;
-            margin-left: 150px; /* Espacio entre la imagen y el título */
+            margin-left: 150px;
             margin-right: 350px;
         }
         .logo {
-            width: 250px; /* Ajusta el tamaño según tus necesidades */
+            width: 250px;
             height: auto;
         }
         .input-container {
             display: flex;
-            align-items: flex-start; /* Alinea en la parte superior */
+            align-items: flex-start;
         }
         .copy-button {
-            margin-left: 0px; /* Espacio entre el área de texto y el botón */
-            margin-top:-35px;
-            display: flex; /* Para alinear verticalmente el contenido del botón */
-            align-items: center; /* Centra verticalmente la imagen del botón */
+            margin-left: 0px;
+            margin-top: -35px;
+            display: flex;
+            align-items: center;
         }
         .copy-button img {
-            width: 25px; /* Ajusta el tamaño de la imagen */
-            height: auto; /* Mantiene la relación de aspecto */
+            width: 25px;
+            height: auto;
         }
     </style>
 </head>
@@ -58,36 +58,61 @@
     </div>
     <p>¡Mejora tu hoja de vida para aumentar tus posibilidades de alcanzar tu empleo deseado!</p>
 
-    <form method="post" action ="{% url 'custom_resume_view'%}">
-        {% csrf_token %}
-    <!-- Upload file -->
-    <div class="row">
-        <div class="col-md-6 custom-box">
-            <label for="cvText" class="form-label">Ingresa tu cv en forma de texto</label>
-            <textarea name="cvText" class="form-control" id="cvText" rows="10" placeholder="Text">{{cvText}}</textarea>
+    <!-- Panel de pestañas -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="resume-tab" data-bs-toggle="tab" data-bs-target="#resume" type="button" role="tab" aria-controls="resume" aria-selected="true">Currículum</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="recommendations-tab" data-bs-toggle="tab" data-bs-target="#recommendations" type="button" role="tab" aria-controls="recommendations" aria-selected="false">Recomendaciones</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+        <!-- Sección Currículum -->
+        <div class="tab-pane fade show active" id="resume" role="tabpanel" aria-labelledby="resume-tab">
+            <form method="post" action="{% url 'custom_resume_view' %}">
+                {% csrf_token %}
+                <div class="row mt-4">
+                    <div class="col-md-6 custom-box">
+                        <label for="cvText" class="form-label">Ingresa tu cv en forma de texto</label>
+                        <textarea name="cvText" class="form-control" id="cvText" rows="10" placeholder="Text">{{ cvText }}</textarea>
+                    </div>
+
+                    <div class="col-md-6 custom-box">
+                        <label for="vacancy" class="form-label">Ingresa vacante y especificaciones</label>
+                        <textarea name="vacancy" class="form-control" id="vacancy" rows="10" placeholder="Text">{{ vacancy }}</textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Mejorar CV</button>
+            </form>
+
+            <!-- CV generado -->
+            <div class="custom-box mt-4">
+                <label for="newCv" class="form-label">Nuevo CV</label>
+                <div class="input-container">
+                    <textarea name="newCv" class="form-control" id="newCv" rows="10" placeholder="Text" readonly>{{ newCv }}</textarea>
+                    <button class="copy-button" onclick="copyToClipboard()">
+                        <img src="{% static 'images/copy.jpg' %}" alt="Copiar" title="Copiar texto"> 
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <div class="col-md-6 custom-box">
-            <label for="vacancy" class="form-label">Ingresa vacante y especificaciones</label>
-            <textarea name="vacancy" class="form-control" id="vacancy" rows="10" placeholder="Text">{{vacancy}}</textarea>
+        <!-- Sección Recomendaciones -->
+        <div class="tab-pane fade" id="recommendations" role="tabpanel" aria-labelledby="recommendations-tab">
+            <div class="custom-box mt-4">
+                <label for="jobSearch" class="form-label">Buscar ultimas tendencias de contratacion</label>
+                <input type="text" id="jobSearch" class="form-control" placeholder="Escribe el empleo que deseas consultar">
+                <button type="button" class="btn btn-success mt-3" onclick="fetchRecommendations()">Buscar recomendaciones</button>
+            </div>
+
+            <div id="recommendationResults" class="mt-4">
+                <!-- Aquí se mostrarán las recomendaciones -->
+            </div>
         </div>
     </div>
-        <button type="submit" class="btn btn-primary">Mejorar cv </button><!-- Botón para enviar el formulario -->
-    </form>
-
-    <!-- CV input -->
-    <div class="custom-box">
-        <label for="newCv" class="form-label">Nuevo CV</label>
-        <div class="input-container">
-            <textarea name="newCv" class="form-control" id="newCv" rows="10" placeholder="Text" readonly>{{ newCv }}</textarea>
-            <button class="copy-button" onclick="copyToClipboard()">
-                <img src="{% static 'images/copy.jpg' %}" alt="Copiar" title="Copiar texto"> 
-            </button>
-        </div>
-    </div>
-    </div>  
-
-    
+</div>  
 
 <script>
     async function copyToClipboard() {
@@ -95,10 +120,38 @@
         textarea.select();
         try {
             await navigator.clipboard.writeText(textarea.value);
-            alert("Texto copiado al portapapeles!"); // Mensaje de confirmación
+            alert("Texto copiado al portapapeles!");
         } catch (err) {
-            alert("Error al copiar el texto."); // Manejo de errores
+            alert("Error al copiar el texto.");
         }
+    }
+
+    async function fetchRecommendations() {
+        const jobTitle = document.getElementById("jobSearch").value;
+        
+        const response = await fetch("{% url 'fetch_recommendations' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ job: jobTitle })
+        });
+        
+        const data = await response.json();
+        const recommendationsDiv = document.getElementById("recommendationResults");
+        
+        recommendationsDiv.innerHTML = ""; // Limpia los resultados previos
+        data.recommendations.forEach(rec => {
+            const box = document.createElement("div");
+            box.className = "custom-box mb-3";
+            box.innerHTML = `<p>${rec}</p>`;
+            recommendationsDiv.appendChild(box);
+        });
+
+        // Cambia a la pestaña de recomendaciones después de la búsqueda
+        const recommendationsTab = new bootstrap.Tab(document.getElementById('recommendations-tab'));
+        recommendationsTab.show();
     }
 </script>
 
