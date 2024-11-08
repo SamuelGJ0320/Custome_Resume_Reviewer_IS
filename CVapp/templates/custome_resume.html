@@ -50,7 +50,7 @@
     </style>
 </head>
 <body>
-    
+
 <div class="container text-center mt-5">
     <div class="title-container">
         <img src="{% static 'images/magneto.png' %}" alt="Logo" class="logo">
@@ -71,8 +71,15 @@
     <div class="tab-content" id="myTabContent">
         <!-- Sección Currículum -->
         <div class="tab-pane fade show active" id="resume" role="tabpanel" aria-labelledby="resume-tab">
-            <form method="post" action="{% url 'custom_resume_view' %}">
+            <form method="post" action="{% url 'custom_resume_view' %}" enctype="multipart/form-data">
                 {% csrf_token %}
+
+                <!-- Campo de carga de archivo PDF -->
+                <div class="mb-3">
+                    <label for="cvFile" class="form-label">Subir CV en PDF o DOCX</label>
+                    <input type="file" name="cvFile" id="cvFile" class="form-control" accept="application/pdf">
+                </div>
+
                 <div class="row mt-4">
                     <div class="col-md-6 custom-box">
                         <label for="cvText" class="form-label">Ingresa tu cv en forma de texto</label>
@@ -84,6 +91,17 @@
                         <textarea name="vacancy" class="form-control" id="vacancy" rows="10" placeholder="Text">{{ vacancy }}</textarea>
                     </div>
                 </div>
+
+                <!-- Selector de formato de salida -->
+                <div class="mt-3">
+                    <label for="outputFormat" class="form-label">Formato de salida:</label>
+                    <select name="outputFormat" id="outputFormat" class="form-select">
+                        <option value="text">Texto</option>
+                        <option value="docx">DOCX</option>
+                        <option value="pdf">PDF</option>
+                    </select>
+                </div>
+
                 <button type="submit" class="btn btn-primary mt-3">Mejorar CV</button>
             </form>
 
@@ -112,7 +130,7 @@
             </div>
         </div>
     </div>
-</div>  
+</div>
 
 <script>
     async function copyToClipboard() {
@@ -128,7 +146,7 @@
 
     async function fetchRecommendations() {
         const jobTitle = document.getElementById("jobSearch").value;
-        
+
         const response = await fetch("{% url 'fetch_recommendations' %}", {
             method: 'POST',
             headers: {
@@ -137,10 +155,10 @@
             },
             body: JSON.stringify({ job: jobTitle })
         });
-        
+
         const data = await response.json();
         const recommendationsDiv = document.getElementById("recommendationResults");
-        
+
         recommendationsDiv.innerHTML = ""; // Limpia los resultados previos
         data.recommendations.forEach(rec => {
             const box = document.createElement("div");
@@ -149,7 +167,6 @@
             recommendationsDiv.appendChild(box);
         });
 
-        // Cambia a la pestaña de recomendaciones después de la búsqueda
         const recommendationsTab = new bootstrap.Tab(document.getElementById('recommendations-tab'));
         recommendationsTab.show();
     }
